@@ -2,7 +2,7 @@ import unittest
 import os
 from PIL import Image
 
-inaccuracy = 0.5  # jpg loss = 0.02 = 2% = 5/256
+inaccuracy = 0.9  # jpg loss = 0.02 = 2% = 5/256
 
 
 def compare_images(infile, outfile):
@@ -25,11 +25,11 @@ class MyTestCase(unittest.TestCase):
     def test_all(self):
         argv = ""
         for i in range(1, 29):
-            argv += " assets/test_input_" + str(i) + ".png"
+            argv += " assets/cleaner/test_input_" + str(i) + ".png"
         os.system('python cleaner.py' + argv)
         for i in range(1, 29):
-            score = compare_images("assets/test_input_" + str(i) + "_ans.png",
-                                   "assets/test_output_" + str(i) + ".png")
+            score = compare_images("assets/cleaner/test_input_" + str(i) + "_ans.png",
+                                   "assets/cleaner/test_output_" + str(i) + ".png")
             print(i, "=>", score, end='    ')
             if i % 5 == 0:
                 print(flush=True)
