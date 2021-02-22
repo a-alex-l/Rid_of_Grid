@@ -2,7 +2,7 @@ import unittest
 import os
 from PIL import Image
 
-inaccuracy = 0.5  # jpg loss = 0.02 = 2% = 5/256
+inaccuracy = 0.1  # jpg loss = 0.02 = 2% = 5/256
 
 
 def compare_images(infile, outfile):

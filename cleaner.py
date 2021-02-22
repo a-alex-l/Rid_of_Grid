@@ -17,13 +17,15 @@ def get_border_grid_and_ink(dists_from_white):
     dists_from = []
     for i in dists:
         dists_from.append((i, np.searchsorted(dists_from_white, i, side='right')))
-    return (dists_from_white[len(dists_from_white) - 1] +
+    return (dists_from_white[int(len(dists_from_white) * 0.99)] +
             dists_from_white[len(dists_from_white) // 2]) / 2
 
 
 def plot_hist(dists_from_white, in_file_name):
     plt.suptitle(in_file_name)
-    plt.hist(dists_from_white, 100)
+    plt.hist(dists_from_white, 256)
+    border = get_border_grid_and_ink(dists_from_white)
+    plt.axvline(x=border, color='r', linestyle='-')
     plt.show()
 
 

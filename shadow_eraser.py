@@ -28,7 +28,7 @@ def get_approximate_color(i, j, gray_image, mask):
 def get_f_color(shadow_color, current_color, global_average):
     x = float(shadow_color) - global_average
     y = float(current_color) - global_average
-    return (x + y) / (((x - y)/50)**4 + 2)
+    return (x + y) / (abs((x - y) / 40) ** 2 + 2)
 
 
 def get_shadow_distribution(gray_image, mask):
@@ -37,12 +37,11 @@ def get_shadow_distribution(gray_image, mask):
         for j in range(ans_image.shape[1]):
             if mask[i, j] != 0:
                 ans_image[i, j] = get_approximate_color(i, j, ans_image, mask)
-    ans_image = cv2.blur(ans_image, (101, 101))
+    ans_image = cv2.blur(ans_image, (501, 501))
     global_average = int(np.average(ans_image))
     for i in range(ans_image.shape[0]):
         for j in range(ans_image.shape[1]):
             ans_image[i, j] = get_f_color(ans_image[i, j], gray_image[i, j], global_average)
-    # cv2.imshow("gray" + in_file, ans_image)
     return ans_image
 
 
@@ -52,7 +51,7 @@ def get_mask_image(mask) -> np.ndarray:
                                  adaptiveMethod=cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                  thresholdType=cv2.THRESH_BINARY_INV,
                                  blockSize=101,  # Parameter!
-                                 C=5)  # Parameter!
+                                 C=0)  # Parameter!
     return mask
 
 
@@ -66,12 +65,30 @@ def save_ans(ans_image, in_file_name):
         pass
 
 
+def secure_minus(image, minus_image):
+    ans_image = image
+    for i in range(ans_image.shape[0]):
+        for j in range(ans_image.shape[1]):
+            ans_image[i, j, 0] = max(0, min(255, int(image[i, j, 0]) -
+                                            (int(minus_image[i, j, 0]) - 255
+                                             if minus_image[i, j, 0] > 128
+                                             else int(minus_image[i, j, 0]))))
+            ans_image[i, j, 1] = max(0, min(255, int(image[i, j, 1]) -
+                                            (int(minus_image[i, j, 1]) - 255
+                                             if minus_image[i, j, 1] > 128
+                                             else int(minus_image[i, j, 1]))))
+            ans_image[i, j, 2] = max(0, min(255, int(image[i, j, 2]) -
+                                            (int(minus_image[i, j, 2]) - 255
+                                             if minus_image[i, j, 2] > 128
+                                             else int(minus_image[i, j, 2]))))
+    return ans_image
+
+
 def rid_of_shadow(image, in_file_name):
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     mask = get_mask_image(gray_image)
     gray_image = get_shadow_distribution(gray_image, mask)
-    ans_image = image - cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGB)
-    # cv2.imshow("ans" + in_file, ans_image)
+    ans_image = secure_minus(image, cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGB))
     save_ans(ans_image, in_file_name)
 
 
@@ -82,5 +99,3 @@ if __name__ == '__main__':
         except OSError:
             raise Warning("Warning: Skipped file " + in_file)
             pass
-
-# cv2.waitKey(0)
