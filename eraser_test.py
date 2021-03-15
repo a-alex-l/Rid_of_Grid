@@ -24,10 +24,10 @@ def compare_images(infile, outfile):
 class MyTestCase(unittest.TestCase):
     def test_all(self):
         argv = ""
-        for i in range(1, 29):
+        for i in range(1, 30):
             argv += " assets/eraser/test_input_" + str(i) + ".png"
         os.system('python shadow_eraser.py' + argv)
-        for i in range(1, 29):
+        for i in range(1, 30):
             score = compare_images("assets/eraser/test_input_" + str(i) + "_ans.png",
                                    "assets/eraser/test_output_" + str(i) + ".png")
             print(i, "=>", score, end='    ')

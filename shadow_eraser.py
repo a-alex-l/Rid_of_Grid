@@ -28,7 +28,7 @@ def get_approximate_color(i, j, gray_image, mask):
 def get_f_color(shadow_color, current_color, global_average):
     x = float(shadow_color) - global_average
     y = float(current_color) - global_average
-    return (x + y) / (abs((x - y) / 40) ** 2 + 2)
+    return (x + y) / (abs((x - y) / 40) ** 2 + 2) + abs(x - y) / 3
 
 
 def get_shadow_distribution(gray_image, mask):
